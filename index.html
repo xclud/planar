@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<head>
+    <meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0'/>
+
+    <title>Plan AR</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Rubik:300,400,500" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,600,700" />
+    <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" />
+</head>
+<!-- three.js library -->
+<script src='vendor/three.js/build/three.js'></script>
+<script src='OBJLoader.js'></script>
+<script src='vendor/three.js/examples/js/libs/stats.min.js'></script>
+<!-- ar.js -->
+<script src="build/ar.js"></script>
+<script>THREEx.ArToolkitContext.baseURL = '../'</script>
+
+<!-- Bind window error for error handling -->
+<script>
+    window.addEventListener('error', function (event) {
+        alert("ERROR: " + event.message + " at " + event.filename + " : " + event.lineno + " : " + event.colno);
+    });
+</script>
+
+<body style='margin : 0px; overflow: hidden; font-family: Monospace;' class="mdc-typography">
+
+    <header class="mdc-top-app-bar">
+        <div class="mdc-top-app-bar__row">
+            <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+                <span class="mdc-top-app-bar__title">Plan AR</span>
+            </section>
+            <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
+                <button onclick="toggleCeiling();" class="material-icons mdc-top-app-bar__action-item" aria-label="Ceiling" alt="Ceiling">layers</button>
+                <!--<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Print this page" alt="Print this page">print</a>
+                <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Bookmark this page" alt="Bookmark this page">bookmark</a>-->
+            </section>
+        </div>
+    </header>
+
+    <div style='position: absolute; top: 64px; width:100%; text-align: center;z-index:1' ;></div>
+
+    <script>
+
+        var showCeiling = false;
+
+        function toggleCeiling() {
+            showCeiling = !showCeiling;
+        }
+
+        // init renderer
+        var renderer = new THREE.WebGLRenderer({
+            // antialias	: true,
+            alpha: true
+        });
+        renderer.setClearColor(new THREE.Color('lightgrey'), 0);
+        // renderer.setPixelRatio( 2 );
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.domElement.style.position = 'absolute';
+        renderer.domElement.style.top = '0px';
+        renderer.domElement.style.left = '0px';
+        document.body.appendChild(renderer.domElement);
+
+        // array of functions for the rendering loop
+        var onRenderFcts = [];
+
+        // init scene and camera
+        var scene = new THREE.Scene();
+
+        //////////////////////////////////////////////////////////////////////////////////
+        //		Initialize a basic camera
+        //////////////////////////////////////////////////////////////////////////////////
+
+        // Create a camera
+        var camera = new THREE.Camera();
+        scene.add(camera);
+
+        ////////////////////////////////////////////////////////////////////////////////
+        //          handle arToolkitSource
+        ////////////////////////////////////////////////////////////////////////////////
+
+        var artoolkitProfile = new THREEx.ArToolkitProfile();
+        artoolkitProfile.sourceWebcam();
+        // artoolkitProfile.sourceVideo(THREEx.ArToolkitContext.baseURL + '../data/videos/headtracking.mp4').kanjiMarker();
+        // artoolkitProfile.sourceImage(THREEx.ArToolkitContext.baseURL + '../data/images/img.jpg').hiroMarker()
+
+        var arToolkitSource = new THREEx.ArToolkitSource(artoolkitProfile.sourceParameters);
+
+        arToolkitSource.init(function onReady() {
+            onResize();
+        })
+
+        // handle resize
+        window.addEventListener('resize', function () {
+            onResize();
+        })
+        function onResize() {
+            arToolkitSource.onResize();
+            arToolkitSource.copySizeTo(renderer.domElement);
+            if (arToolkitContext.arController !== null) {
+                arToolkitSource.copySizeTo(arToolkitContext.arController.canvas);
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////
+        //          initialize arToolkitContext
+        ////////////////////////////////////////////////////////////////////////////////
+
+        // create atToolkitContext
+        var arToolkitContext = new THREEx.ArToolkitContext(artoolkitProfile.contextParameters);
+        // initialize it
+        arToolkitContext.init(function onCompleted() {
+            // copy projection matrix to camera
+            camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+        });
+
+        // update artoolkit on every frame
+        onRenderFcts.push(function () {
+            if (arToolkitSource.ready === false) return;
+
+            arToolkitContext.update(arToolkitSource.domElement);
+        });
+
+
+        ////////////////////////////////////////////////////////////////////////////////
+        //          Create a ArMarkerControls
+        ////////////////////////////////////////////////////////////////////////////////
+
+        var markerGroup = new THREE.Group();
+        scene.add(markerGroup);
+        var markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerGroup, {
+            type: 'pattern',
+            patternUrl: THREEx.ArToolkitContext.baseURL + '../data/data/patt.hiro',
+        });
+
+
+        // // build a smoothedControls
+        // var smoothedGroup = new THREE.Group()
+        // scene.add(smoothedGroup)
+        // var smoothedControls = new THREEx.ArSmoothedControls(smoothedGroup)
+        // onRenderFcts.push(function(delta){
+        // 	smoothedControls.update(markerGroup)
+        // })
+
+        //////////////////////////////////////////////////////////////////////////////////
+        //		add an object in the scene
+        //////////////////////////////////////////////////////////////////////////////////
+
+        var markerScene = new THREE.Scene();
+        markerGroup.add(markerScene);
+
+        var directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        directionalLight.position.set(5, 10, 7.5);
+        markerScene.add(directionalLight);
+
+
+        var room = null;
+        var ceiling = null;
+
+
+        var loader = new THREE.OBJLoader();
+        loader.load('room.obj', function (obj) {
+            room = obj;
+            obj.scale.set(0.5, 0.5, 0.5);
+            markerScene.add(obj);
+        });
+
+        loader.load('ceiling.obj', function (obj) {
+            ceiling = obj;
+            obj.scale.set(0.5, 0.5, 0.5);
+            markerScene.add(obj);
+        });
+
+        //var mesh = new THREE.AxisHelper();
+        //markerScene.add(mesh);
+
+        //////////////////////////////////////////////////////////////////////////////////
+        //		render the whole thing on the page
+        //////////////////////////////////////////////////////////////////////////////////
+        var stats = new Stats();
+        //document.body.appendChild(stats.dom);
+        // render the scene
+        onRenderFcts.push(function () {
+
+            if (ceiling) ceiling.visible = showCeiling;
+
+            renderer.render(scene, camera);
+            //stats.update();
+        })
+
+        // run the rendering loop
+        var lastTimeMsec = null;
+        requestAnimationFrame(function animate(nowMsec) {
+            // keep looping
+            requestAnimationFrame(animate);
+            // measure time
+            lastTimeMsec = lastTimeMsec || nowMsec - 1000 / 60;
+            var deltaMsec = Math.min(200, nowMsec - lastTimeMsec);
+            lastTimeMsec = nowMsec;
+            // call each update function
+            onRenderFcts.forEach(function (onRenderFct) {
+                onRenderFct(deltaMsec / 1000, nowMsec / 1000);
+            })
+        })
+    </script>
+</body>
