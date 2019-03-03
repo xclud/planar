@@ -15,7 +15,7 @@
 <script src='vendor/three.js/examples/js/libs/stats.min.js'></script>
 <!-- ar.js -->
 <script src="build/ar.js"></script>
-<script>THREEx.ArToolkitContext.baseURL = '../'</script>
+<script>THREEx.ArToolkitContext.baseURL = '/'</script>
 
 <!-- Bind window error for error handling -->
 <script>
@@ -131,7 +131,7 @@
         scene.add(markerGroup);
         var markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerGroup, {
             type: 'pattern',
-            patternUrl: THREEx.ArToolkitContext.baseURL + '../data/data/patt.hiro',
+            patternUrl: THREEx.ArToolkitContext.baseURL + '/data/patt.hiro',
         });
 
 
