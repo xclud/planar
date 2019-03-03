@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <head>
-    <meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0'/>
+    <meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0' />
 
     <title>Plan AR</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
@@ -13,6 +13,7 @@
 <script src='vendor/three.js/build/three.min.js'></script>
 <script src='OBJLoader.js'></script>
 <script src='vendor/three.js/examples/js/libs/stats.min.js'></script>
+<script src='vendor/screenfull/screenfull.min.js'></script>
 <!-- ar.js -->
 <script src="build/ar.js"></script>
 <script>THREEx.ArToolkitContext.baseURL = '';</script>
@@ -32,7 +33,9 @@
                 <span class="mdc-top-app-bar__title">Plan AR</span>
             </section>
             <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
+                <button onclick="toggleFullscreen();" class="material-icons mdc-top-app-bar__action-item" aria-label="Fullscreen" alt="Fullscreen">fullscreen</button>
                 <button onclick="toggleCeiling();" class="material-icons mdc-top-app-bar__action-item" aria-label="Ceiling" alt="Ceiling">layers</button>
+
                 <!--<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Print this page" alt="Print this page">print</a>
                 <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Bookmark this page" alt="Bookmark this page">bookmark</a>-->
             </section>
@@ -47,6 +50,12 @@
 
         function toggleCeiling() {
             showCeiling = !showCeiling;
+        }
+
+        function toggleFullscreen() {
+            if (screenfull.enabled) {
+                screenfull.toggle();
+            }
         }
 
         // init renderer
