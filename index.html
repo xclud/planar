@@ -38,7 +38,7 @@
                 <button onclick="toggleCeiling();" class="material-icons mdc-top-app-bar__action-item" aria-label="Ceiling" alt="Ceiling">layers</button>
 
                 <!--<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Print this page" alt="Print this page">print</a>
-    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Bookmark this page" alt="Bookmark this page">bookmark</a>-->
+                <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Bookmark this page" alt="Bookmark this page">bookmark</a>-->
             </section>
         </div>
     </header>
@@ -51,8 +51,8 @@
         var showFurniture = false;
 
         function toggleCeiling() {
-            showFurniture = !showCeiling;
-    }
+            showCeiling = !showCeiling;
+        }
 
 
         function toggleFurniture() {
@@ -67,7 +67,7 @@
 
         // init renderer
         var renderer = new THREE.WebGLRenderer({
-            // antialias	: true,
+            antialias: true,
             alpha: true
         });
         renderer.setClearColor(new THREE.Color('lightgrey'), 0);
@@ -169,41 +169,56 @@
         var directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
         directionalLight.position.set(5, 10, 7.5);
         markerScene.add(directionalLight);
-		
-		
+
+
         var directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
         directionalLight2.position.set(5, 10, -7.5);
         markerScene.add(directionalLight2);
-		
-		var ambientLight = new THREE.AmbientLight( 0x404040 ); // soft white light
-		markerScene.add( ambientLight );
 
+        var ambientLight = new THREE.AmbientLight(0x404040); // soft white light
+        markerScene.add(ambientLight);
 
-        var room = null;
-        var ceiling = null;
-		var scale = 3;
-		var xoffset = 1;
-		var zoffset = -1;
-		
-		function fixScalePosition(obj)
-		{
-		            obj.position.set(xoffset, 0, zoffset);
-					  obj.scale.set(scale, scale, scale);
-		}
+        var scale = 0.5;
+        var xoffset = 0;
+        var zoffset = 0;
+
+        var layers = [
+            { path: 'floor.obj', layer: 0 },
+            { path: 'walls.obj', layer: 0 },
+            { path: 'bed.obj', layer: 1 },
+            { path: 'doors.obj', layer: 1 },
+            { path: 'glasses.obj', layer: 1 },
+            { path: 'sink.obj', layer: 1 },
+            { path: 'sofa.obj', layer: 1 },
+            { path: 'toilet.obj', layer: 1 },
+            { path: 'ceiling.obj', layer: 2 }
+        ];
+
+        function fixScalePosition(obj) {
+            obj.position.set(xoffset, 0, zoffset);
+            obj.scale.set(scale, scale, scale);
+        }
+
 
 
         var loader = new THREE.OBJLoader();
-        loader.load('room.obj', function (obj) {
-            room = obj;
-			fixScalePosition(obj);
-            markerScene.add(obj);
-        });
+        var group1 = new THREE.Group();
+        var group2 = new THREE.Group();
+        var group3 = new THREE.Group();
 
-        loader.load('ceiling.obj', function (obj) {
-            ceiling = obj;
-        	fixScalePosition(obj);
-            markerScene.add(obj);
-        });
+        var groups = [group1, group2, group3];
+
+    for (var i = 0; i < layers.length; i++) {
+        const layer = layers[i];
+            loader.load('data/models/' + layer.path, function (obj) {
+                groups[layer.layer].add(obj);
+                fixScalePosition(obj);
+            });
+        }
+
+        markerScene.add(group1);
+        markerScene.add(group2);
+        markerScene.add(group3);
 
         //var mesh = new THREE.AxisHelper();
         //markerScene.add(mesh);
@@ -216,7 +231,8 @@
         // render the scene
         onRenderFcts.push(function () {
 
-            if (ceiling) ceiling.visible = showCeiling;
+            if (group2) group2.visible = showFurniture;
+            if (group3) group3.visible = showCeiling;
 
             renderer.render(scene, camera);
             //stats.update();
