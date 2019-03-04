@@ -11,7 +11,8 @@
 </head>
 <!-- three.js library -->
 <script src='vendor/three.js/build/three.min.js'></script>
-<script src='OBJLoader.js'></script>
+<script src='lib/OBJLoader.js'></script>
+<script src='lib/MTLLoader.js'></script>
 <script src='vendor/three.js/examples/js/libs/stats.min.js'></script>
 <script src='vendor/screenfull/screenfull.min.js'></script>
 <!-- ar.js -->
@@ -63,6 +64,15 @@
             if (screenfull.enabled) {
                 screenfull.toggle();
             }
+        }
+
+        function setMat(obj, mat) {
+            // For any meshes in the model, add our material.
+            obj.traverse(function (node) {
+
+                if (node.isMesh) node.material = mat;
+
+            });
         }
 
         // init renderer
@@ -178,9 +188,9 @@
         var ambientLight = new THREE.AmbientLight(0x404040); // soft white light
         markerScene.add(ambientLight);
 
-        var scale = 0.5;
-        var xoffset = 0;
-        var zoffset = 0;
+        var scale = 1.5;
+        var xoffset = 1;
+        var zoffset = -1;
 
         var layers = [
             { path: 'floor.obj', layer: 0 },
@@ -194,6 +204,7 @@
             { path: 'ceiling.obj', layer: 2 }
         ];
 
+
         function fixScalePosition(obj) {
             obj.position.set(xoffset, 0, zoffset);
             obj.scale.set(scale, scale, scale);
@@ -201,18 +212,25 @@
 
 
 
-        var loader = new THREE.OBJLoader();
+        var objloader = new THREE.OBJLoader();
         var group1 = new THREE.Group();
         var group2 = new THREE.Group();
         var group3 = new THREE.Group();
 
         var groups = [group1, group2, group3];
 
-    for (var i = 0; i < layers.length; i++) {
-        const layer = layers[i];
-            loader.load('data/models/' + layer.path, function (obj) {
-                groups[layer.layer].add(obj);
-                fixScalePosition(obj);
+        for (var i = 0; i < layers.length; i++) {
+            const layer = layers[i];
+            const name = layer.path.replace('.obj', '');
+            new THREE.MTLLoader().load('data/models/' + name + '.mtl', function (materials) {
+                var objloader = new THREE.OBJLoader();
+                objloader.setMaterials(materials);
+
+                objloader.load('data/models/' + layer.path, function (obj) {
+                    groups[layer.layer].add(obj);
+                    fixScalePosition(obj);
+                });
+
             });
         }
 
