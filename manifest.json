@@ -1,6 +1,7 @@
 {
   "name": "Plan AR",
   "short_name": "Plan AR",
+  "description": "Plan AR",
   "icons": [
       {
         "src": "images/icon-48-48.png",
@@ -34,8 +35,8 @@
         "sizes": "512x512"
       } 
       ],
-  "start_url": "/",
-  "scope": "/",
+  "start_url": "/planar",
+  "scope": "/planar",
   "display": "standalone",
   "background_color": "#6200ee",
   "theme_color": "#6200ee"
