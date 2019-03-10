@@ -1,34 +1,34 @@
 const version = 'v1::';
 const cache_urls = [
-    '/data/models/bed.obj',
-	'/data/models/bed.mtl',
+    'data/models/bed.obj',
+	'data/models/bed.mtl',
 	
-	'/data/models/ceiling.obj',
-	'/data/models/ceiling.mtl',	
+	'data/models/ceiling.obj',
+	'data/models/ceiling.mtl',	
 	
-	'/data/models/doors.obj',
-	'/data/models/doors.mtl',	
+	'data/models/doors.obj',
+	'data/models/doors.mtl',	
 	
-	'/data/models/floor.obj',
-	'/data/models/floor.mtl',	
+	'data/models/floor.obj',
+	'data/models/floor.mtl',	
 	
-	'/data/models/glasses.obj',
-	'/data/models/glasses.mtl',	
+	'data/models/glasses.obj',
+	'data/models/glasses.mtl',	
 	
-	'/data/models/sink.obj',
-	'/data/models/sink.mtl',	
+	'data/models/sink.obj',
+	'data/models/sink.mtl',	
 	
-	'/data/models/sofa.obj',
-	'/data/models/sofa.mtl',	
+	'data/models/sofa.obj',
+	'data/models/sofa.mtl',	
 	
-	'/data/models/toilet.obj',
-	'/data/models/toilet.mtl',	
+	'data/models/toilet.obj',
+	'data/models/toilet.mtl',	
 	
-	'/data/models/walls.obj',
-	'/data/models/walls.mtl',
+	'data/models/walls.obj',
+	'data/models/walls.mtl',
 	
-    '/offline.html',	
-    '/favicon.ico',
+    'offline.html',	
+    'favicon.ico',
 
     'https://fonts.googleapis.com/icon?family=Material+Icons',
     'https://fonts.googleapis.com/css?family=Rubik:300,400,500',
