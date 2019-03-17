@@ -184,8 +184,13 @@
         var xoffset = 1;
         var zoffset = -1;
 
+        var groupFurniture = new THREE.Group();
+        var groupCeiling = new THREE.Group();
+
         var jsonloader = new THREE.ObjectLoader();
         jsonloader.load('data/models/scene.json', function (scene) {
+            groupFurniture = scene.getObjectByName("Furniture");
+            groupCeiling = scene.getObjectByName("Ceiling");
             markerGroup.add(scene);
         });
 
@@ -193,15 +198,7 @@
         function fixScalePosition(obj) {
             obj.position.set(xoffset, 0, zoffset);
             obj.scale.set(scale, scale, scale);
-        }
-
-        var group1 = new THREE.Group();
-        var group2 = new THREE.Group();
-        var group3 = new THREE.Group();
-
-
-        //var mesh = new THREE.AxisHelper();
-        //markerScene.add(mesh);
+    }
 
         //////////////////////////////////////////////////////////////////////////////////
         //		render the whole thing on the page
@@ -211,8 +208,8 @@
         // render the scene
         onRenderFcts.push(function () {
 
-            if (group2) group2.visible = showFurniture;
-            if (group3) group3.visible = showCeiling;
+            if (groupFurniture) groupFurniture.visible = showFurniture;
+            if (groupCeiling) groupCeiling.visible = showCeiling;
 
             renderer.render(scene, camera);
             //stats.update();
