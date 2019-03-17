@@ -191,6 +191,7 @@
         jsonloader.load('data/models/scene.json', function (scene) {
             groupFurniture = scene.getObjectByName("Furniture");
             groupCeiling = scene.getObjectByName("Ceiling");
+            fixScalePosition(scene);
             markerGroup.add(scene);
         });
 
