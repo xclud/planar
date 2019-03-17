@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Rubik:300,400,500" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,600,700" />
-    <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" />
+    <link rel="stylesheet" href="lib/mdc/material-components-web.min.css" />
 </head>
 <script src='site.js'></script>
 <!-- three.js library -->
@@ -80,15 +80,6 @@
             if (screenfull.enabled) {
                 screenfull.toggle();
             }
-        }
-
-        function setMat(obj, mat) {
-            // For any meshes in the model, add our material.
-            obj.traverse(function (node) {
-
-                if (node.isMesh) node.material = mat;
-
-            });
         }
 
         // init renderer
@@ -189,36 +180,14 @@
         //		add an object in the scene
         //////////////////////////////////////////////////////////////////////////////////
 
-        var markerScene = new THREE.Scene();
-        markerGroup.add(markerScene);
-
-        var directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-        directionalLight.position.set(5, 10, 7.5);
-        markerScene.add(directionalLight);
-
-
-        var directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
-        directionalLight2.position.set(5, 10, -7.5);
-        markerScene.add(directionalLight2);
-
-        var ambientLight = new THREE.AmbientLight(0x404040); // soft white light
-        markerScene.add(ambientLight);
-
         var scale = 1.5;
         var xoffset = 1;
         var zoffset = -1;
 
-        var layers = [
-            { path: 'floor.obj', layer: 0 },
-            { path: 'walls.obj', layer: 0 },
-            { path: 'bed.obj', layer: 1 },
-            { path: 'doors.obj', layer: 1 },
-            { path: 'glasses.obj', layer: 1 },
-            { path: 'sink.obj', layer: 1 },
-            { path: 'sofa.obj', layer: 1 },
-            { path: 'toilet.obj', layer: 1 },
-            { path: 'ceiling.obj', layer: 2 }
-        ];
+        var jsonloader = new THREE.ObjectLoader();
+        jsonloader.load('data/models/scene.json', function (scene) {
+            markerGroup.add(scene);
+        });
 
 
         function fixScalePosition(obj) {
@@ -226,33 +195,10 @@
             obj.scale.set(scale, scale, scale);
         }
 
-
-
-        var objloader = new THREE.OBJLoader();
         var group1 = new THREE.Group();
         var group2 = new THREE.Group();
         var group3 = new THREE.Group();
 
-        var groups = [group1, group2, group3];
-
-        for (var i = 0; i < layers.length; i++) {
-            const layer = layers[i];
-            const name = layer.path.replace('.obj', '');
-            new THREE.MTLLoader().load('data/models/' + name + '.mtl', function (materials) {
-                var objloader = new THREE.OBJLoader();
-                objloader.setMaterials(materials);
-
-                objloader.load('data/models/' + layer.path, function (obj) {
-                    groups[layer.layer].add(obj);
-                    fixScalePosition(obj);
-                });
-
-            });
-        }
-
-        markerScene.add(group1);
-        markerScene.add(group2);
-        markerScene.add(group3);
 
         //var mesh = new THREE.AxisHelper();
         //markerScene.add(mesh);
